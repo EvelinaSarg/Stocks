@@ -63,12 +63,12 @@ else:
     latest_data = latest_data.drop(columns=[col for col in columns_to_drop if col in latest_data.columns])
 
     # Apply custom styling to the latest data table
-    def highlight_percentage_change(val):
-        color = 'lightgreen' if val > 0 else 'lightcoral'
-        return f'background-color: {color}'
+    def highlight_row(row):
+        color = 'lightgreen' if row['percentage_change'] > 0 else 'lightcoral'
+        return ['background-color: {}'.format(color) for _ in row]
 
     def style_table(df):
-        return df.style.applymap(highlight_percentage_change, subset=['percentage_change'])
+        return df.style.apply(highlight_row, axis=1)
 
     # Format the columns to 2 decimal places
     latest_data_style = style_table(latest_data).format({
