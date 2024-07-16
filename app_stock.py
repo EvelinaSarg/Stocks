@@ -31,9 +31,9 @@ if 'ticker' not in data.columns:
     st.error("The column 'ticker' does not exist in the data.")
 else:
     # Streamlit app
-    st.title("Stock Market Dashboard/n")
+    st.title("Stock Market Dashboard")
 
-    
+    print()
 
     # Display the latest average daily data for each stock
     #st.header("Latest Average Daily Data")
