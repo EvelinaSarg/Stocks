@@ -26,12 +26,6 @@ def load_data():
 
 data = load_data()
 
-# Display the columns in the DataFrame
-st.write("DataFrame Columns:", data.columns)
-
-# Display a sample of the data
-st.write("Data Sample:", data.head())
-
 # Check if 'ticker' column exists
 if 'ticker' not in data.columns:
     st.error("The column 'ticker' does not exist in the data.")
