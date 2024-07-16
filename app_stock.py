@@ -26,7 +26,6 @@ def load_data():
 
 data = load_data()
 
-
 # Check if 'ticker' column exists
 if 'ticker' not in data.columns:
     st.error("The column 'ticker' does not exist in the data.")
@@ -55,12 +54,25 @@ else:
     st.header("Latest Average Daily Data")
     latest_data = df.groupby('ticker').tail(1)
     latest_data.set_index('ticker', inplace=True)
-    st.dataframe(latest_data[['date', 'open', 'high', 'low', 'close', 'volume']], width=900, height=200)
+
+    # Apply custom styling to the latest data table
+    def highlight_max(s):
+        is_max = s == s.max()
+        return ['background-color: lightgreen' if v else '' for v in is_max]
+
+    latest_data_styled = latest_data.style.apply(highlight_max, subset=['open', 'high', 'low', 'close', 'volume'])
+    st.dataframe(latest_data_styled, width=900, height=200)
 
     # Display the daily percentage change for each stock
     st.header("Daily Percentage Change")
     percentage_change = latest_data[['date', 'percentage_change']]
-    st.dataframe(percentage_change, width=600, height=200)
+
+    # Apply custom styling to the percentage change table
+    def highlight_positive(s):
+        return ['background-color: lightgreen' if v > 0 else 'background-color: lightcoral' for v in s]
+
+    percentage_change_styled = percentage_change.style.apply(highlight_positive, subset=['percentage_change'])
+    st.dataframe(percentage_change_styled, width=600, height=200)
 
     # Plot volume traded bar chart
     st.header("Volume Traded for Selected Stock")
