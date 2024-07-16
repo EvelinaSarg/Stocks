@@ -64,6 +64,19 @@ else:
     }).apply(style_specific_columns)
     st.dataframe(latest_data_style, width=900, height=213)
 
+
+
+    percentage_change = latest_data[['date', 'percentage_change']]
+    
+    # Apply custom styling to the percentage change table
+    def style_percentage_change(val):
+        color = 'green' if val > 0 else 'red'
+        return f'color: {color}'
+
+    percentage_change_style = percentage_change.style.applymap(style_percentage_change, subset=['percentage_change'])
+    st.dataframe(percentage_change_style, width=600, height=200)
+
+    
     # Plot volume traded bar chart
     st.header("Volume Traded for Selected Stock")
     selected_stock = st.selectbox('Select a stock', latest_data.index)
