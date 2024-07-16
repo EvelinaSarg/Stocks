@@ -33,7 +33,8 @@ else:
     # Streamlit app
     st.title("Stock Market Dashboard")
 
-    print()
+    st.write("")
+    st.write("")
 
     # Display the latest average daily data for each stock
     #st.header("Latest Average Daily Data")
