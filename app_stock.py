@@ -63,22 +63,25 @@ else:
     latest_data = latest_data.drop(columns=[col for col in columns_to_drop if col in latest_data.columns])
     
     # Apply custom styling to the latest data table
-    def style_specific_columns(s):
-        return ['background-color: lightblue' if s.name == 'ticker' else
-                'background-color: lightgreen' if s.name == 'open' else
-                'background-color: lightpink' if s.name == 'high' else
-                'background-color: lightyellow' if s.name == 'low' else
-                'background-color: lightgray' if s.name == 'close' else
-                'background-color: lightcoral' if s.name == 'volume' else
-                '' for _ in s]
+    def style_specific_columns(row):
+        color = 'lightgreen' if row['percentage_change'] < 0 else 'lightcoral'
+        return ['background-color: lightblue' if col == 'ticker' else
+                'background-color: lightgreen' if col == 'open' else
+                'background-color: lightpink' if col == 'high' else
+                'background-color: lightyellow' if col == 'low' else
+                'background-color: lightgray' if col == 'close' else
+                'background-color: lightcoral' if col == 'volume' else
+                f'background-color: {color}' if col == 'percentage_change' else
+                '' for col in latest_data.columns]
 
     # Format the columns to 2 decimal places
     latest_data_style = latest_data.style.format({
         'open': '{:.2f}',
         'high': '{:.2f}',
         'low': '{:.2f}',
-        'close': '{:.2f}'
-    }).apply(style_specific_columns)
+        'close': '{:.2f}',
+        'percentage_change': '{:.4f}'
+    }).apply(style_specific_columns, axis=1)
     st.dataframe(latest_data_style, width=900, height=213)
 
     # Display the daily percentage change for each stock
