@@ -67,7 +67,7 @@ else:
         df['percentage_change'] = df['close'].pct_change() * 100
         return df
     st.header("Daily Percentage Change")
-    percentage_change = latest_data[['date', 'percentage_change']]
+    percentage_change = calculate_percentage_change[['date', 'percentage_change']]
     st.dataframe(percentage_change)
 
 
