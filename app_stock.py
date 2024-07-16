@@ -23,88 +23,98 @@ def load_data():
 
 data = load_data()
 
-# Function to calculate daily percentage change
-def calculate_percentage_change(df):
-    df['percentage_change'] = df['close'].pct_change() * 100
-    return df
+# Display the columns in the DataFrame
+st.write("DataFrame Columns:", data.columns)
 
-# Calculate daily percentage change for each stock
-stocks = data['ticker'].unique()
-percentage_changes = []
+# Display a sample of the data
+st.write("Data Sample:", data.head())
 
-for stock in stocks:
-    stock_df = data[data['ticker'] == stock].copy()
-    stock_df = calculate_percentage_change(stock_df)
-    percentage_changes.append(stock_df)
+# Check if 'ticker' column exists
+if 'ticker' not in data.columns:
+    st.error("The column 'ticker' does not exist in the data.")
+else:
+    # Function to calculate daily percentage change
+    def calculate_percentage_change(df):
+        df['percentage_change'] = df['close'].pct_change() * 100
+        return df
 
-# Concatenate the updated dataframes
-df = pd.concat(percentage_changes)
+    # Calculate daily percentage change for each stock
+    stocks = data['ticker'].unique()
+    percentage_changes = []
 
-# Streamlit app
-st.title("Stock Market Dashboard")
+    for stock in stocks:
+        stock_df = data[data['ticker'] == stock].copy()
+        stock_df = calculate_percentage_change(stock_df)
+        percentage_changes.append(stock_df)
 
-# Display the latest average daily data for each stock
-st.header("Latest Average Daily Data")
-latest_data = df.groupby('ticker').tail(1)
-latest_data.set_index('ticker', inplace=True)
-st.dataframe(latest_data[['date', 'open', 'high', 'low', 'close', 'volume']])
+    # Concatenate the updated dataframes
+    df = pd.concat(percentage_changes)
 
-# Display the daily percentage change for each stock
-st.header("Daily Percentage Change")
-percentage_change = latest_data[['date', 'percentage_change']]
-st.dataframe(percentage_change)
+    # Streamlit app
+    st.title("Stock Market Dashboard")
 
-# Plot volume traded bar chart
-st.header("Volume Traded for Selected Stock")
-selected_stock = st.selectbox('Select a stock', stocks)
-stock_df = df[df['ticker'] == selected_stock]
+    # Display the latest average daily data for each stock
+    st.header("Latest Average Daily Data")
+    latest_data = df.groupby('ticker').tail(1)
+    latest_data.set_index('ticker', inplace=True)
+    st.dataframe(latest_data[['date', 'open', 'high', 'low', 'close', 'volume']])
 
-fig, ax = plt.subplots(figsize=(12, 6))
-ax.bar(stock_df['date'], stock_df['volume'], color='skyblue', edgecolor='blue', label=selected_stock)
+    # Display the daily percentage change for each stock
+    st.header("Daily Percentage Change")
+    percentage_change = latest_data[['date', 'percentage_change']]
+    st.dataframe(percentage_change)
 
-# Enhancements
-ax.set_title(f'{selected_stock} Trading Volume', fontsize=20, fontweight='bold')
-ax.set_xlabel('Date', fontsize=14, fontweight='bold')
-ax.set_ylabel('Volume', fontsize=14, fontweight='bold')
+    # Plot volume traded bar chart
+    st.header("Volume Traded for Selected Stock")
+    selected_stock = st.selectbox('Select a stock', stocks)
+    stock_df = df[df['ticker'] == selected_stock]
 
-ax.xaxis.set_major_locator(mdates.WeekdayLocator())
-ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
-plt.xticks(rotation=45, fontsize=10)
-ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, loc: "{:,}".format(int(x))))
-ax.grid(True, which='both', linestyle='--', linewidth=0.5)
-# Show the plot
-plt.tight_layout()
-st.pyplot(fig)
+    fig, ax = plt.subplots(figsize=(12, 6))
+    ax.bar(stock_df['date'], stock_df['volume'], color='skyblue', edgecolor='blue', label=selected_stock)
 
-# Line graph for all stocks' closing prices
-st.header("Weekly Closing Prices of All Stocks")
-fig, ax = plt.subplots(figsize=(10, 5))
+    # Enhancements
+    ax.set_title(f'{selected_stock} Trading Volume', fontsize=20, fontweight='bold')
+    ax.set_xlabel('Date', fontsize=14, fontweight='bold')
+    ax.set_ylabel('Volume', fontsize=14, fontweight='bold')
 
-# Use seaborn color palette for better visuals
-palette = sns.color_palette("tab10", len(stocks))
-for i, stock in enumerate(stocks):
-    stock_df = df[df['ticker'] == stock]
-    ax.plot(stock_df['date'], stock_df['close'], label=stock, color=palette[i])
+    ax.xaxis.set_major_locator(mdates.WeekdayLocator())
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+    plt.xticks(rotation=45, fontsize=10)
+    ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, loc: "{:,}".format(int(x))))
+    ax.grid(True, which='both', linestyle='--', linewidth=0.5)
+    # Show the plot
+    plt.tight_layout()
+    st.pyplot(fig)
 
-ax.set_title('Closing Prices of All Stocks')
-ax.set_xlabel('Date')
-ax.set_ylabel('Closing Price')
-ax.legend()
-ax.grid(True)
+    # Line graph for all stocks' closing prices
+    st.header("Weekly Closing Prices of All Stocks")
+    fig, ax = plt.subplots(figsize=(10, 5))
 
-# Set major ticks every week and format the date
-ax.xaxis.set_major_locator(mdates.WeekdayLocator(interval=1))
-ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+    # Use seaborn color palette for better visuals
+    palette = sns.color_palette("tab10", len(stocks))
+    for i, stock in enumerate(stocks):
+        stock_df = df[df['ticker'] == stock]
+        ax.plot(stock_df['date'], stock_df['close'], label=stock, color=palette[i])
 
-# Make every 2nd tick label visible to avoid clutter
-for i, label in enumerate(ax.get_xticklabels()):
-    if i % 2 == 0:
-        label.set_visible(True)
-    else:
-        label.set_visible(False)
+    ax.set_title('Closing Prices of All Stocks')
+    ax.set_xlabel('Date')
+    ax.set_ylabel('Closing Price')
+    ax.legend()
+    ax.grid(True)
 
-# Rotate date labels for better readability
-plt.setp(ax.get_xticklabels(), rotation=45, ha='right')
-plt.tight_layout()
+    # Set major ticks every week and format the date
+    ax.xaxis.set_major_locator(mdates.WeekdayLocator(interval=1))
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
 
-st.pyplot(fig)
+    # Make every 2nd tick label visible to avoid clutter
+    for i, label in enumerate(ax.get_xticklabels()):
+        if i % 2 == 0:
+            label.set_visible(True)
+        else:
+            label.set_visible(False)
+
+    # Rotate date labels for better readability
+    plt.setp(ax.get_xticklabels(), rotation=45, ha='right')
+    plt.tight_layout()
+
+    st.pyplot(fig)
