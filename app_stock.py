@@ -65,7 +65,7 @@ else:
     # Apply custom styling to the latest data table
     def style_specific_columns(row):
         color = 'lightgreen' if row['percentage_change'] > 0 else 'lightcoral'
-        return ['background-color: 'lightyellow' if col=='ticker' else
+        return ['background-color: lightpink' if col=='ticker' else
                 'background-color: lightblue' if col == 'open' else
                 'background-color: lightpink' if col == 'high' else
                 'background-color: lightyellow' if col == 'date' else
