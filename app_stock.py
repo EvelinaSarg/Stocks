@@ -66,6 +66,7 @@ else:
     def style_specific_columns(row):
         color = 'lightgreen' if row['percentage_change'] < 0 else 'lightcoral'
         return ['background-color: lightblue' if col == 'ticker' else
+                'background-color: lightyellow' if col == 'date' else
                 'background-color: lightgreen' if col == 'open' else
                 'background-color: lightpink' if col == 'high' else
                 'background-color: lightyellow' if col == 'low' else
