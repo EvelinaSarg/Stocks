@@ -30,6 +30,23 @@ data = load_data()
 if 'ticker' not in data.columns:
     st.error("The column 'ticker' does not exist in the data.")
 else:
+    # Function to calculate daily percentage change
+    def calculate_percentage_change(df):
+        df['percentage_change'] = df['close'].pct_change() * 100
+        return df
+
+    # Calculate daily percentage change for each stock
+    stocks = data['ticker'].unique()
+    percentage_changes = []
+
+    for stock in stocks:
+        stock_df = data[data['ticker'] == stock].copy()
+        stock_df = calculate_percentage_change(stock_df)
+        percentage_changes.append(stock_df)
+
+    # Concatenate the updated dataframes
+    df = pd.concat(percentage_changes)
+
     # Streamlit app
     st.title("Stock Market Dashboard")
 
@@ -37,12 +54,12 @@ else:
     st.write("")
 
     # Display the latest average daily data for each stock
-    #st.header("Latest Average Daily Data")
-    latest_data = data.groupby('ticker').tail(1)
+    st.header("Latest Average Daily Data")
+    latest_data = df.groupby('ticker').tail(1)
     latest_data.set_index('ticker', inplace=True)
 
-    # Drop the 'id' and 'percentage_change' columns if they exist
-    columns_to_drop = ['id', 'percentage_change']
+    # Drop the 'id' column if it exists
+    columns_to_drop = ['id']
     latest_data = latest_data.drop(columns=[col for col in columns_to_drop if col in latest_data.columns])
     
     # Apply custom styling to the latest data table
@@ -63,31 +80,27 @@ else:
         'close': '{:.2f}'
     }).apply(style_specific_columns)
     st.dataframe(latest_data_style, width=900, height=213)
-    def calculate_percentage_change(df):
-        df['percentage_change'] = df['close'].pct_change() * 100
-        return df
+
+    # Display the daily percentage change for each stock
     st.header("Daily Percentage Change")
-    percentage_change = calculate_percentage_change[['date', 'percentage_change']]
-    st.dataframe(percentage_change)
-
-
-
-
     percentage_change = latest_data[['date', 'percentage_change']]
     
     # Apply custom styling to the percentage change table
-    def style_percentage_change(val):
-        color = 'green' if val > 0 else 'red'
-        return f'color: {color}'
+    def style_specific_columns_percentage_change(s):
+        return ['background-color: lightblue' if s.name == 'ticker' else
+                'background-color: lightyellow' if s.name == 'date' else
+                'background-color: lightcoral' if s.name == 'percentage_change' else
+                '' for _ in s]
 
-    percentage_change_style = percentage_change.style.applymap(style_percentage_change, subset=['percentage_change'])
+    percentage_change_style = percentage_change.style.format({
+        'percentage_change': '{:.4f}'
+    }).apply(style_specific_columns_percentage_change)
     st.dataframe(percentage_change_style, width=600, height=200)
 
-    
     # Plot volume traded bar chart
     st.header("Volume Traded for Selected Stock")
     selected_stock = st.selectbox('Select a stock', latest_data.index)
-    stock_df = data[data['ticker'] == selected_stock]
+    stock_df = df[df['ticker'] == selected_stock]
 
     fig, ax = plt.subplots(figsize=(12, 6))
     ax.bar(stock_df['date'], stock_df['volume'], color='skyblue', edgecolor='blue', label=selected_stock)
@@ -113,7 +126,7 @@ else:
     # Use seaborn color palette for better visuals
     palette = sns.color_palette("tab10", len(latest_data.index))
     for i, stock in enumerate(latest_data.index):
-        stock_df = data[data['ticker'] == stock]
+        stock_df = df[df['ticker'] == stock]
         ax.plot(stock_df['date'], stock_df['close'], label=stock, color=palette[i])
 
     ax.set_title('Closing Prices of All Stocks')
