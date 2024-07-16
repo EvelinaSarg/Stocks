@@ -63,25 +63,22 @@ else:
     latest_data = latest_data.drop(columns=[col for col in columns_to_drop if col in latest_data.columns])
 
     # Apply custom styling to the latest data table
-    def style_specific_columns(row):
-        color = 'lightgreen' if row['percentage_change'] > 0 else 'lightcoral'
-        return ['background-color: lightpink' if col=='ticker' else
-                'background-color: lightblue' if col == 'open' else
-                'background-color: lightpink' if col == 'high' else
-                'background-color: lightyellow' if col == 'date' else
-                'background-color: lightgray' if col == 'close' else
-                'background-color: lightblue' if col == 'volume' else
-                '' for col in latest_data.columns]
+    def highlight_percentage_change(val):
+        color = 'lightgreen' if val > 0 else 'lightcoral'
+        return f'background-color: {color}'
+
+    def style_table(df):
+        return df.style.applymap(highlight_percentage_change, subset=['percentage_change'])
 
     # Format the columns to 2 decimal places
-    latest_data_style = latest_data.style.format({
+    latest_data_style = style_table(latest_data).format({
         'open': '{:.2f}',
         'high': '{:.2f}',
         'low': '{:.2f}',
         'close': '{:.2f}',
         'volume': '{:.0f}',
         'percentage_change': '{:.4f}'
-    }).apply(style_specific_columns, axis=1)
+    })
 
     st.dataframe(latest_data_style, width=900, height=213)
 
