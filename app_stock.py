@@ -101,4 +101,23 @@ else:
 
     ax.set_title('Closing Prices of All Stocks')
     ax.set_xlabel('Date')
-    ax.set_ylabel('Clos
+    ax.set_ylabel('Closing Price')
+    ax.legend()
+    ax.grid(True)
+
+    # Set major ticks every week and format the date
+    ax.xaxis.set_major_locator(mdates.WeekdayLocator(interval=1))
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+
+    # Make every 2nd tick label visible to avoid clutter
+    for i, label in enumerate(ax.get_xticklabels()):
+        if i % 2 == 0:
+            label.set_visible(True)
+        else:
+            label.set_visible(False)
+
+    # Rotate date labels for better readability
+    plt.setp(ax.get_xticklabels(), rotation=45, ha='right')
+    plt.tight_layout()
+
+    st.pyplot(fig)
