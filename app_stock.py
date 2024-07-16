@@ -61,7 +61,7 @@ else:
         'low': '{:.2f}',
         'close': '{:.2f}'
     }).apply(style_specific_columns)
-    st.dataframe(latest_data_style, width=900, height=205)
+    st.dataframe(latest_data_style, width=900, height=210)
 
     # Plot volume traded bar chart
     st.header("Volume Traded for Selected Stock")
