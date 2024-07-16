@@ -63,6 +63,13 @@ else:
         'close': '{:.2f}'
     }).apply(style_specific_columns)
     st.dataframe(latest_data_style, width=900, height=213)
+    def calculate_percentage_change(df):
+        df['percentage_change'] = df['close'].pct_change() * 100
+        return df
+    st.header("Daily Percentage Change")
+    percentage_change = latest_data[['date', 'percentage_change']]
+    st.dataframe(percentage_change)
+
 
 
 
