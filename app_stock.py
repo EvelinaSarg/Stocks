@@ -26,12 +26,6 @@ def load_data():
 
 data = load_data()
 
-# Display the columns in the DataFrame
-st.write("DataFrame Columns:", data.columns)
-
-# Display a sample of the data
-st.write("Data Sample:", data.head())
-
 # Check if 'ticker' column exists
 if 'ticker' not in data.columns:
     st.error("The column 'ticker' does not exist in the data.")
@@ -61,24 +55,36 @@ else:
     latest_data = df.groupby('ticker').tail(1)
     latest_data.set_index('ticker', inplace=True)
     
-    # Style for Latest Average Daily Data Table
-    latest_data_style = latest_data.style.set_properties(**{
-        'background-color': 'lightblue',
-        'color': 'black',
-        'border-color': 'white'
-    })
+    # Apply custom styling to the latest data table
+    def style_specific_columns(s):
+        return ['background-color: lightblue' if s.name == 'ticker' else
+                'background-color: lightgreen' if s.name == 'open' else
+                'background-color: lightpink' if s.name == 'high' else
+                'background-color: lightyellow' if s.name == 'low' else
+                'background-color: lightgray' if s.name == 'close' else
+                'background-color: lightcoral' if s.name == 'volume' else
+                '' for _ in s]
+
+    # Format the columns to 2 decimal places
+    latest_data_style = latest_data.style.format({
+        'open': '{:.2f}',
+        'high': '{:.2f}',
+        'low': '{:.2f}',
+        'close': '{:.2f}'
+    }).apply(style_specific_columns)
     st.dataframe(latest_data_style, width=900, height=200)
 
     # Display the daily percentage change for each stock
     st.header("Daily Percentage Change")
     percentage_change = latest_data[['date', 'percentage_change']]
     
-    # Style for Daily Percentage Change Table
-    percentage_change_style = percentage_change.style.set_properties(**{
-        'background-color': 'lightyellow',
-        'color': 'black',
-        'border-color': 'white'
-    })
+    # Apply custom styling to the percentage change table
+    def style_percentage_change(s):
+        return ['background-color: lightgreen' if v > 0 else 'background-color: lightcoral' for v in s]
+
+    percentage_change_style = percentage_change.style.format({
+        'percentage_change': '{:.2f}'
+    }).apply(style_percentage_change, subset=['percentage_change'])
     st.dataframe(percentage_change_style, width=600, height=200)
 
     # Plot volume traded bar chart
