@@ -1,7 +1,6 @@
 import yfinance as yf
 import pandas as pd
 from sqlalchemy import create_engine
-import psycopg2
 import streamlit as st
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
@@ -15,12 +14,14 @@ db_name = st.secrets['DB_NAME']
 db_table = st.secrets['DB_TABLE']
 db_port = st.secrets['DB_PORT']
 
-# Establish a connection to PostgreSQL
-engine= create_engine(f'postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}')
-query = f'SELECT * FROM {db_table}'
-data= pd.read_sql(query, engine)
-load_data()
+# Establish a connection to PostgreSQL and load data
+def load_data():
+    engine = create_engine(f'postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}')
+    query = f'SELECT * FROM {db_table}'
+    data = pd.read_sql(query, engine)
+    return data
 
+data = load_data()
 
 # Function to calculate daily percentage change
 def calculate_percentage_change(df):
@@ -28,11 +29,11 @@ def calculate_percentage_change(df):
     return df
 
 # Calculate daily percentage change for each stock
-stocks = df['ticker'].unique()
+stocks = data['ticker'].unique()
 percentage_changes = []
 
 for stock in stocks:
-    stock_df = df[df['ticker'] == stock].copy()
+    stock_df = data[data['ticker'] == stock].copy()
     stock_df = calculate_percentage_change(stock_df)
     percentage_changes.append(stock_df)
 
