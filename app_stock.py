@@ -6,6 +6,9 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import seaborn as sns
 
+# Set the page configuration
+st.set_page_config(page_title="Stock Market Dashboard", layout="centered")
+
 # Retrieve database credentials from Streamlit secrets
 db_user = st.secrets['DB_USER']
 db_password = st.secrets['DB_PASSWORD']
@@ -22,12 +25,6 @@ def load_data():
     return data
 
 data = load_data()
-
-# Display the columns in the DataFrame
-st.write("DataFrame Columns:", data.columns)
-
-# Display a sample of the data
-st.write("Data Sample:", data.head())
 
 # Check if 'ticker' column exists
 if 'ticker' not in data.columns:
@@ -57,12 +54,12 @@ else:
     st.header("Latest Average Daily Data")
     latest_data = df.groupby('ticker').tail(1)
     latest_data.set_index('ticker', inplace=True)
-    st.dataframe(latest_data[['date', 'open', 'high', 'low', 'close', 'volume']])
+    st.dataframe(latest_data[['date', 'open', 'high', 'low', 'close', 'volume']], width=900, height=200)
 
     # Display the daily percentage change for each stock
     st.header("Daily Percentage Change")
     percentage_change = latest_data[['date', 'percentage_change']]
-    st.dataframe(percentage_change)
+    st.dataframe(percentage_change, width=600, height=200)
 
     # Plot volume traded bar chart
     st.header("Volume Traded for Selected Stock")
