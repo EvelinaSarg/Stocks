@@ -34,7 +34,7 @@ else:
     st.title("Stock Market Dashboard")
 
     # Display the latest average daily data for each stock
-    st.header("Latest Average Daily Data")
+    #st.header("Latest Average Daily Data")
     latest_data = data.groupby('ticker').tail(1)
     latest_data.set_index('ticker', inplace=True)
 
