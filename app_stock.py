@@ -33,6 +33,8 @@ else:
     # Streamlit app
     st.title("Stock Market Dashboard")
 
+    /n
+
     # Display the latest average daily data for each stock
     #st.header("Latest Average Daily Data")
     latest_data = data.groupby('ticker').tail(1)
