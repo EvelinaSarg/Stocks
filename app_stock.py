@@ -83,7 +83,7 @@ else:
     st.dataframe(latest_data_style, width=900, height=213)
 
     # Plot volume traded bar chart
-    st.header("Volume Traded for Selected Stock")
+    st.header("Stock Trade Volume")
     selected_stock = st.selectbox('Select a stock', latest_data.index)
     stock_df = df[df['ticker'] == selected_stock]
 
